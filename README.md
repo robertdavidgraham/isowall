@@ -21,22 +21,21 @@ This should also work on Windows, Mac OS X, xBSD, and pretty much any operating 
 
 # Running
 
-First of all, make sure that the network interfaces have no IP addresses bound, no any network stack.
-This is the most important step: the idea is that we are copmletely isolating the target device
-from any local networks. That device should not be able to detect the presence of `isowall` with
-anything going across the network.
+First, setup a machine with three network interfaces.
 
-The typical way of running `isowall` is to plug in two USB Ethernet adapters into a simple device like
-a Raspberry Pi, then configuring this software to bridge between them. The original Ethernet adapter built
-into the Raspberry Pi is used for normal SSH communication. In other words, the typical configuration
-will have three Ethernet adapters: one for control (and a real network stack), and two for running purely
-with `libpcap`.
+The first network interface (like `eth0`) will be configured as normal, with a TCP/IP stack,
+so that you can SSH to it.
+
+The other two network interfaces should have no TCP/IP stack, no IP address, no anything. This is the
+most important configuration step, and the most common thing you'll get wrong. For examlpe, the DHCP
+software on the box may be confgiured to automatically send out DHCP requests on these additional
+interfaces. You have to go fix that so nothing is bound to these interfaces.
 
 To run, simply type:
 
-    # ./bin/isowall -c xxxx.conf
+    # ./bin/isowall --internal eth1 --external eth2 -c xxxx.conf
   
-where `xxxx.conf` contains your configuration, which is described
+where `xxxx.conf` contains your configuration, which is described below.
 
 
 # Configuration
