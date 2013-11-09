@@ -9,10 +9,10 @@ This project depends upon `libpcap`, and of course a C compiler.
 
 On Debian, the following should work:
 
-  # apt-get install git gcc make libpcap-dev
-  # git clone https://github.com/robertdavidgraham/isowall
-  # cd isowall
-  # make
+    # apt-get install git gcc make libpcap-dev
+    # git clone https://github.com/robertdavidgraham/isowall
+    # cd isowall
+    # make
   
 This will put the binary `isowall` in the local `isowall/bin` directory.
 
@@ -34,7 +34,7 @@ with `libpcap`.
 
 To run, simply type:
 
-  # ./bin/isowall -c xxxx.conf
+    # ./bin/isowall -c xxxx.conf
   
 where `xxxx.conf` contains your configuration, which is described
 
@@ -43,18 +43,18 @@ where `xxxx.conf` contains your configuration, which is described
 
 The following shows a typical configuration file
 
-  internal = eth1
-  internal.target.ip = 10.0.0.129
-  internal.target.mac = 02:60:8c:37:87:f3
+    internal = eth1
+    internal.target.ip = 10.0.0.129
+    internal.target.mac = 02:60:8c:37:87:f3
   
-  external = eth2
-  external.router.ip = 10.0.0.1
-  external.router.mac = 66:55:44:33:22:11
+    external = eth2
+    external.router.ip = 10.0.0.1
+    external.router.mac = 66:55:44:33:22:11
   
-  allow = 0.0.0.0/0
-  block = 192.168.0.0/16
-  block = 10.0.0.0/8
-  block = 224.0.0.0-255.255.255.255
+    allow = 0.0.0.0/0
+    block = 192.168.0.0/16
+    block = 10.0.0.0/8
+    block = 224.0.0.0-255.255.255.255
 
 
 The target device we are isolating has the indicated IP and MAC address.
