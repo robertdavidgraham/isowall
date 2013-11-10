@@ -6,7 +6,9 @@
 #include <pcap.h>
 #include <string.h>
 
-#if !defined(WIN32)
+#if defined(WIN32)
+#include <Windows.h>
+#else
 #include <unistd.h>
 #endif
 
@@ -480,9 +482,24 @@ isowall_bridge(struct IsoWall *isowall)
     }
 
     pixie_begin_thread(inbound_thread, 0, isowall);
-    //pixie_begin_thread(outbound_thread, 0, isowall);
-    outbound_thread(isowall);
+    pixie_begin_thread(outbound_thread, 0, isowall);
 
+    /* Print continuous status messages */
+    for (;;) {
+#if defined(WIN32)
+        Sleep(1000);
+#else
+        sleep(1);
+#endif
+
+        fprintf(stderr, "inbound[drop=%-10llu forward=%-10llu] outbound[drop=%-10u forward=%-10llu",
+                isowall->ex.stats.blocked,
+                isowall->ex.stats.allowed,
+                isowall->in.stats.blocked,
+                isowall->in.stats.allowed); 
+
+    }
+    
 
 }
 
