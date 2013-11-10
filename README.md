@@ -2,6 +2,9 @@ isowall
 =======
 
 This is a mini-firewall that completely isolates a target device from the local network.
+This is for allowing infected machines Internet access, but without endangering the
+local network.
+
 
 # Building
 
@@ -77,4 +80,22 @@ Inbound packets must have the following conditions:
   * source IPv4 address within an `allow` range, but not in a `block` range
   * if an ARP packet, then the source IPv4 address must equal that `external.router.ip`
   * if an ARP packet, then must be a "reply"
+
+
+# Security Guarantee
+
+There is no guarantee, of course, but this program has pretty good security.
+
+The security rests on the fact that there is **no IP stack bound to adapters**.
+What that means is that the infected targetted cannot touch the firewall
+machine in any way, except as allowed within the `is_allowed()` function.
+That function represents the majority of the attack surface for the firewall
+machine. And, as you can tell from reading the function, it contains almost
+no functionality, meaning that the attack surface is very small indeed.
+
+There are a few theoretical attacks that might happen at the physical layer,
+but for the most part, we don't have to worry about them.
+
+
+
 
