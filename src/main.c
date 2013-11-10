@@ -526,7 +526,7 @@ isowall_bridge(struct IsoWall *isowall)
         sleep(1);
 #endif
 
-        fprintf(stderr, "inbound[drop=%-10llu forward=%-10llu] outbound[drop=%-10u forward=%-10llu",
+        fprintf(stderr, "inbound[drop=%-8lluforward=%-8llu] outbound[drop=%-8uforward=%-8llu]\r",
                 isowall->ex.stats.blocked,
                 isowall->ex.stats.allowed,
                 isowall->in.stats.blocked,
