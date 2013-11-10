@@ -172,6 +172,20 @@ is_valid(const unsigned char *px, size_t length,
 
 /****************************************************************************
  ****************************************************************************/
+static int
+is_myself(const unsigned char *mac, const unsigned char *px, unsigned length)
+{
+    if (length < 12)
+        return 0;
+    if (memcmp(px+0, mac, 6) == 0)
+        return 1;
+    if (memcmp(px+6, mac, 6) == 0)
+        return 1;
+    return 0;
+}
+
+/****************************************************************************
+ ****************************************************************************/
 void
 inbound_thread(void *v)
 {
@@ -198,6 +212,16 @@ inbound_thread(void *v)
                     &px);
         if (err != 0 || length == 0)
             continue;
+
+        if (!isowall->is_reuse_external && is_myself(src->my_mac, px, length)) {
+            LOG(0, "*** DANGER *** DANGER *** DANGER ***\n");
+            LOG(0, " A packet was discovered with MAC address of the adapter, \n");
+            LOG(0, " indicating that some other software has started using this \n");
+            LOG(0, " network. You are now exposed to the infected machine. Isowall \n");
+            LOG(0, " is shutting down\n");
+            LOG(0, "*** DANGER *** DANGER *** DANGER ***\n");
+            exit(1);
+        }
 
         if (is_valid(px, length, src, dst, allowed, 1)) {
             src->stats.allowed++;
@@ -238,6 +262,16 @@ outbound_thread(void *v)
                     &px);
         if (err != 0 || length == 0)
             continue;
+
+        if (!isowall->is_reuse_internal && is_myself(src->my_mac, px, length)) {
+            LOG(0, "*** DANGER *** DANGER *** DANGER ***\n");
+            LOG(0, " A packet was discovered with MAC address of the adapter, \n");
+            LOG(0, " indicating that some other software has started using this \n");
+            LOG(0, " network. You are now exposed to the infected machine. Isowall \n");
+            LOG(0, " is shutting down\n");
+            LOG(0, "*** DANGER *** DANGER *** DANGER ***\n");
+            exit(1);
+        }
 
         if (is_valid(px, length, src, dst, allowed, 0)) {
             src->stats.allowed++;
