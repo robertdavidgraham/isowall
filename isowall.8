@@ -1,0 +1,99 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "ISOWALL" "8" "November 2013" "" ""
+.
+.SH "NAME"
+\fBisowall\fR \- Simplistic isolating firewall
+.
+.SH "SYNOPSIS"
+isowall \-\-conf <file\.conf>
+.
+.SH "DESCRIPTION"
+\fBisowall\fR is a stupid simpled firewall for isolating a hostile machine from the local network, but still provide it access to the Internet\. This is useful for studying viruses, or setting up open WiFi access\-points\.
+.
+.P
+The primary feature of this program is that it doesn\'t integrate with the local machine\'s TCP/IP stack, but instead, can only be used on network adapters without a network stack bound to them\. This drastically reduces the attack surface exposed to hostile attack\.
+.
+.SH "OPTIONS"
+Everything can be set on the command\-line prefixed with \fB\-\-\fR, or within a configuration file without the \fB\-\-\fR prefix, but with a \fB=\fR between the name and value\.
+.
+.IP "\(bu" 4
+\fB\-\-internal\-ifname <if>\fR: The name of the network adapter that is connected to the hostile device that is to be isolated\. A common example would be something like \fBeth1\fR\. This network adapter must not already be used for networking, or the program will fail\.
+.
+.IP "\(bu" 4
+\fB\-\-internal\-target\-ip <ip>\fR: The IPv4 address of the hostile machine\. This program only accepts outbound packets from this one IP address, or inbound packets destined to this IP adress\.
+.
+.IP "\(bu" 4
+\fB\-\-internal\-target\-mac <mac>\fR: The MAC address (also known as Etherent address) of the hostile machine that is being isolated\. For best security, this should be manually configured\. If not, it will be auto\-discovered by ARPing the target\'s IP address\.
+.
+.IP "\(bu" 4
+\fB\-\-internal\-my\-mac\fR: The MAC address of the adapter used for the internal network\. If not manually configured, it will automatically be detected\. This is used to verify that no other program is using the network adapter except for this program\.
+.
+.IP "\(bu" 4
+\fB\-\-external\-ifname <if>\fR: The name of the network adapter that is on the Internet\-side of the firewall\. Ideally, this network adapter should not be used for any other purpose\. In some cases, the primary network adapter (like \fBeth0\fR) may be used, in which case the parameter \fB\-\-reuse\-external\fR must be specified, or the program will fail\.
+.
+.IP "\(bu" 4
+\fB\-\-external\-router\-ip <ip>\fR: The IP address of the local router that will forward packets to the Internet\. This is needed for filtering ARP packets, to make sure that the hostile device can only ARP for the router\'s IP address\.
+.
+.IP "\(bu" 4
+\fB\-\-external\-target\-mac <mac>\fR: The MAC address (also known as Etherent address) of the external router\. For best security, this should be manually configured\. If not, it will be auto\-discovered by ARPing the router\'s IP address\.
+.
+.IP "\(bu" 4
+\fB\-\-external\-my\-mac\fR: The MAC address of the adapter used for the external network\. If not manually configured, it will automatically be detected\. This is used to verify that no other program is using the network adapter except for this program\. If you want to share the extenral network adapter with other programs on the machine, you must specified \fB\-\-reuse\-external\fR\.
+.
+.IP "\(bu" 4
+\fB\-\-conf <filename>\fR: Reads in a configuration file\. The format of the configuration file is described below\. By default, the program will attempt to read \fB/etc/isowall\.conf\fR\.
+.
+.IP "\(bu" 4
+\fB\-\-echo\fR: Don\'t run, but instead dump the current configuration to a file\. This file can then be used with the \fB\-\-conf\fR option\. The format of this output is described below under \'CONFIGURATION FILE\'\.
+.
+.IP "\(bu" 4
+\fB\-\-block <ip/range>\fR: Block (deny, drop) the isolated machine from communicating with the indicated IP addresses\. These are always at a higher priority than \fB\-\-allow\fR addresses, regardless of the order they are specified\. Some useful ranges are the local network (like \fB10\.0\.0\.0/8\fR) and broadcast/multicast addresses (like \fB224\.0\.0\.0\-255\.255\.255\.255\fR)\.
+.
+.IP "\(bu" 4
+\fB\-\-blockfile <filename>\fR: Adds all the ranges in the file to the block list\. A useful file might be the \fBdefault\-block\.conf\fR file that comes with isowall\.
+.
+.IP "\(bu" 4
+\fB\-\-iflist\fR: List the available network interfaces, and then exits\. This is useful to discover which interfaces isowall can see\.
+.
+.IP "\(bu" 4
+\fB\-\-packet\-trace\fR: Prints a summary of packets that are successfully forwarded through isowall, one summary per line\. This is useful at low rates, like a few packets per second, but will overwhelm the terminal at high rates\.
+.
+.IP "\(bu" 4
+\fB\-\-regress\fR: Run a regression test, returns \'0\' on success and \'1\' on failure\.
+.
+.IP "" 0
+.
+.SH "CONFIGURATION FILE FORMAT"
+The configuration file uses the same parameter names as on the commandline, but without the \fB\-\-\fR prefix, and with an \fB=\fR sign between the name and the value\. An example configuration file might be:
+.
+.IP "" 4
+.
+.nf
+
+internal = eth1
+internal\-target\-ip = 10\.20\.30\.207
+
+reuse\-external = true
+external = eth0
+external\-router\-ip = 10\.0\.0\.1
+
+allow = 0\.0\.0\.0/0
+
+block = 10\.0\.0\.0/8
+block = 224\.0\.0\.0\-255\.255\.255\.255
+blockfile = default\-block\.conf
+.
+.fi
+.
+.IP "" 0
+.
+.P
+By default, the program will read default configuration from the file \fB/etc/isowall\.conf\fR\.
+.
+.SH "SEE ALSO"
+pcap(3)
+.
+.SH "AUTHORS"
+This tool was written by Robert Graham\. The source code is available at https://github\.com/robertdavidgraham/isowall\.

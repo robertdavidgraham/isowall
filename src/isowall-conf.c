@@ -73,7 +73,7 @@ echo_nics(const struct IsoWall *isowall, FILE *fp)
     
     adapter = &isowall->in;
 
-    fprintf(fp, "internal = %s\n", adapter->ifname?adapter->ifname:"");
+    fprintf(fp, "internal.ifname = %s\n", adapter->ifname?adapter->ifname:"");
     if (adapter->target_ip != 0)
     fprintf(fp, "internal.target.ip = %u.%u.%u.%u\n",
             (adapter->target_ip>>24)&0xFF,
@@ -101,7 +101,7 @@ echo_nics(const struct IsoWall *isowall, FILE *fp)
 
     adapter = &isowall->ex;
 
-    fprintf(fp, "external = %s\n", adapter->ifname?adapter->ifname:"");
+    fprintf(fp, "external.ifname = %s\n", adapter->ifname?adapter->ifname:"");
     if (adapter->target_ip != 0)
     fprintf(fp, "external.router.ip = %u.%u.%u.%u\n",
             (adapter->target_ip>>24)&0xFF,

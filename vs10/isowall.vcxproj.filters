@@ -99,5 +99,6 @@
   <ItemGroup>
     <None Include="..\Makefile" />
     <None Include="..\README.md" />
+    <None Include="..\isowall.8.md" />
   </ItemGroup>
 </Project>

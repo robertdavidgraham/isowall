@@ -41,6 +41,7 @@
     <ClInclude Include="..\src\string_s.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\isowall.8.md" />
     <None Include="..\Makefile" />
     <None Include="..\README.md" />
   </ItemGroup>
