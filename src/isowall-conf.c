@@ -14,6 +14,15 @@
 #include <ctype.h>
 #include <limits.h>
 
+/*****************************************************************************
+ * Put all exits in one location so that I can set a breakpoint here in
+ * the debugger.
+ *****************************************************************************/
+static void
+my_exit(int x)
+{
+    exit(x);
+}
 
 /*****************************************************************************
  *****************************************************************************/
@@ -21,7 +30,7 @@ static void
 isowall_help(void)
 {
     printf("");
-    exit(1);
+    my_exit(1);
 }
 
 /****************************************************************************
@@ -30,7 +39,7 @@ void
 isowall_usage(void)
 {
     LOG(0, "usage:\n see https://github.com/robertdavidgraham/isowall\n");
-    exit(1);
+    my_exit(1);
 }
 
 
@@ -190,7 +199,7 @@ ranges_from_file(struct RangeList *ranges, const char *filename)
     err = fopen_s(&fp, filename, "rt");
     if (err) {
         perror(filename);
-        exit(1); /* HARD EXIT: because if it's an exclusion file, we don't
+        my_exit(1); /* HARD EXIT: because if it's an exclusion file, we don't
                   * want to continue. We don't want ANY chance of
                   * accidentally scanning somebody */
     }
@@ -245,7 +254,7 @@ ranges_from_file(struct RangeList *ranges, const char *filename)
                 if (i+1 >= sizeof(address)) {
                     LOG(0, "%s:%u:%u: bad address spec: \"%.*s\"\n",
                             filename, line_number, offset, i, address);
-                    exit(1);
+                    my_exit(1);
                 } else
                     address[i] = (char)c;
                 i++;
@@ -257,7 +266,7 @@ ranges_from_file(struct RangeList *ranges, const char *filename)
             if (range.begin == 0xFFFFFFFF && range.end == 0) {
                 LOG(0, "%s:%u:%u: bad range spec: \"%.*s\"\n", 
                         filename, line_number, offset, i, address);
-                exit(1);
+                my_exit(1);
             } else {
                 rangelist_add_range(ranges, range.begin, range.end);
             }
@@ -352,7 +361,7 @@ static void
 adapter_set_parameter(struct Adapter *adapter,
                       const char *name, const char *value)
 {
-    if (EQUALS("name", name) || EQUALS("name", name) || name[0] == '\0') {
+    if (EQUALS("name", name) || EQUALS("ifname", name) || name[0] == '\0') {
         /*
          * The 'name' of the adapter, like "eth1"
          */
@@ -377,7 +386,7 @@ adapter_set_parameter(struct Adapter *adapter,
             LOG(0, "FAIL: bad IPv4 address: %s=%s\n", 
                     name, value);
             LOG(0, "hint   addresses look like \"19.168.1.23\"\n");
-            exit(1);
+            my_exit(1);
         }
 
         adapter->target_ip = range.begin;
@@ -386,7 +395,7 @@ adapter_set_parameter(struct Adapter *adapter,
 
         if (parse_mac_address(value, mac) != 0) {
             fprintf(stderr, "FAIL: bad MAC address: %s=%s\n", name, value);
-            exit(1);
+            my_exit(1);
             return;
         }
 
@@ -396,7 +405,7 @@ adapter_set_parameter(struct Adapter *adapter,
 
         if (parse_mac_address(value, mac) != 0) {
             fprintf(stderr, "FAIL: bad MAC address: %s=%s\n", name, value);
-            exit(1);
+            my_exit(1);
             return;
         }
 
@@ -413,7 +422,7 @@ adapter_set_parameter(struct Adapter *adapter,
     } else {
         LOG(0, "unknown adapter configuration parameter: %s=%s\n", 
             name, value);
-        exit(1);
+        my_exit(1);
     }
 }
 
@@ -433,7 +442,7 @@ parse_ranges(struct RangeList *list, const char *value)
         range = range_parse_ipv4(value, &offset, max_offset);
         if (range.end < range.begin) {
             fprintf(stderr, "FAIL: bad IP address/range: %s\n", value);
-            exit(1);
+            my_exit(1);
         }
 
         /* add to our allow/block list */
@@ -461,7 +470,9 @@ isowall_set_parameter(struct IsoWall *isowall,
             name++;
         adapter_set_parameter(&isowall->in, name, value);
     } else if (memcmp("ex", name, 2) == 0) {
-        while (*name && *name != '.')
+        while (*name && *name != '.' && *name != '-')
+            name++;
+        while (ispunct(name[0]&0xFF))
             name++;
         adapter_set_parameter(&isowall->ex, name, value);
     } else if (EQUALS("conf", name) || EQUALS("config", name)) {
@@ -477,14 +488,14 @@ isowall_set_parameter(struct IsoWall *isowall,
             isowall->op = Operation_DebugIF;
         } else {
             LOG(0, "unknown debug function: %s\n", value);
-            exit(1);
+            my_exit(1);
         }
     } else if (EQUALS("echo", name)) {
         isowall_echo(isowall, stdout);
-        exit(1);
+        my_exit(1);
     } else if (EQUALS("help", name)) {
         isowall_help();
-        exit(1);
+        my_exit(1);
     } else if (EQUALS("excludefile", name) || EQUALS("blockfile", name)
                 || EQUALS("denyfile", name) || EQUALS("dropfile", name)) {
         unsigned count1 = isowall->block.count;
@@ -533,7 +544,7 @@ isowall_set_parameter(struct IsoWall *isowall,
         }
     } else {
         fprintf(stderr, "FAIL: unknown config option: %s=%s\n", name, value);
-        exit(1);
+        my_exit(1);
     }
     return 1;
 }
@@ -634,14 +645,14 @@ isowall_command_line(struct IsoWall *isowall, int argc, char *argv[])
             default:
                 LOG(0, "FAIL: unknown option: -%s\n", argv[i]);
                 LOG(0, " [hint] try \"--help\"\n");
-                exit(1);
+                my_exit(1);
             }
             continue;
         }
 
         fprintf(stderr, "FAIL: unknown command-line parameter \"%s\"\n", argv[i]);
         fprintf(stderr, " [hint] did you want \"--%s\"?\n", argv[i]);
-        exit(1);
+        my_exit(1);
     }
 }
 
