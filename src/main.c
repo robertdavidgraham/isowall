@@ -197,13 +197,6 @@ inbound_thread(void *v)
         if (err != 0 || length == 0)
             continue;
 
-        if (memcmp(px+6, src->target_mac, 6) != 0)
-            continue;
-        if (memcmp(px+0, dst->target_mac, 6) != 0
-            && memcmp(px+0, "\xFF\xFF\xFF\xFF\xFF\xFF", 6) != 0
-            && memcmp(px+0, "\x00\x00\x00\x00\x00\x00", 6) != 0)
-            continue;
-
         if (is_valid(px, length, src, dst, allowed, 1)) {
             src->stats.allowed++;
             rawsock_send_packet(dst->raw, px, length, 1);
@@ -214,6 +207,8 @@ inbound_thread(void *v)
 }
 
 /****************************************************************************
+ * Same as inbound thread, but src/dst reversed, and is_inbound parameter
+ * reversed. I need to make these two the same function.
  ****************************************************************************/
 void
 outbound_thread(void *v)
