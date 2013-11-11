@@ -30,8 +30,8 @@ The first network interface (like `eth0`) will be configured as normal, with a T
 so that you can SSH to it.
 
 The other two network interfaces should have no TCP/IP stack, no IP address, no anything. This is the
-most important configuration step, and the most common thing you'll get wrong. For examlpe, the DHCP
-software on the box may be confgiured to automatically send out DHCP requests on these additional
+most important configuration step, and the most common thing you'll get wrong. For example, the DHCP
+software on the box may be configured to automatically send out DHCP requests on these additional
 interfaces. You have to go fix that so nothing is bound to these interfaces.
 
 To run, simply type:
