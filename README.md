@@ -87,7 +87,7 @@ Inbound packets must have the following conditions:
 There is no guarantee, of course, but this program has pretty good security.
 
 The security rests on the fact that there is **no IP stack bound to adapters**.
-What that means is that the infected targetted cannot touch the firewall
+What that means is that the infected target cannot touch the firewall
 machine in any way, except as allowed within the `is_allowed()` function.
 That function represents the majority of the attack surface for the firewall
 machine. And, as you can tell from reading the function, it contains almost
